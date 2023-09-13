@@ -73,8 +73,11 @@ func NewBlockchain() *Blockchain {
 		b := tx.Bucket([]byte(blocksBucket))
 
 		if b == nil {
-			fmt.Println("No existing blockchain found. Creating a new one...")
-			genesis := NewGenesisBlock()
+			cbtx := NewCoinbaseTX(address, genesisCoinbaseData)
+			genesis := NewGenesisBlock(cbtx)
+
+			b, err := tx.CreateBucket([]byte(blocksBucket))
+			err = b.Put(genesis.Hash, genesis.Serialize())
 
 			b, err := tx.CreateBucket([]byte(blocksBucket))
 			if err != nil {
@@ -106,4 +109,10 @@ func NewBlockchain() *Blockchain {
 
 	return &bc
 
+}
+
+func (bc *Blockchain) MineBlock(transactions []*Transaction) {
+	...
+	newBlock := NewBlock(transactions, lastHash)
+	...
 }
